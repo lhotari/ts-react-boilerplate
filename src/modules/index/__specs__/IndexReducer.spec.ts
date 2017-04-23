@@ -17,7 +17,9 @@ import IndexReducer, {
     SET_DONE_SUCCESS,
     setDoneSuccess,
     IndexState,
+    IndexActions,
 } from '../IndexReducer';
+import 'rxjs/add/operator/reduce';
 
 describe('IndexReducer', () => {
     it('should set the correct title as payload on setTitle', () => {
@@ -37,9 +39,10 @@ describe('IndexReducer', () => {
 
     it('should trigger the correct action on saveTodoEpic', async () => {
         return await saveTodoEpic(ActionsObservable.of(saveTodo()), { getState: () => undefined, dispatch: () => {} })
-            .forEach(actionReceived =>
-                expect(actionReceived)
-                    .toEqual(saveTodoSuccess()));
+            .reduce((acc: IndexActions[], value: IndexActions, index: number): IndexActions[] => acc.concat(value), [] as IndexActions[])
+                .forEach(actionsReceived =>
+                    expect(actionsReceived)
+                        .toContainEqual(saveTodoSuccess()));
     });
 
     it('should set the correct values on saveTodoSuccess', () => {
@@ -63,9 +66,10 @@ describe('IndexReducer', () => {
 
     it('should trigger the correct action on setDoneEpic', async () => {
         return await setDoneEpic(ActionsObservable.of(setDone(0)), { getState: () => undefined, dispatch: () => {} })
-            .forEach(actionReceived =>
-                expect(actionReceived)
-                    .toEqual(setDoneSuccess(0)));
+            .reduce((acc: IndexActions[], value: IndexActions, index: number): IndexActions[] => acc.concat(value), [] as IndexActions[])
+                .forEach(actionsReceived =>
+                    expect(actionsReceived)
+                        .toContainEqual(setDoneSuccess(0)));
     });
 
     it('should set the correct values on setDoneSuccess', () => {
